@@ -394,7 +394,7 @@ function App() {
     <div className="app">
       <header className="top-header">
         <div className="header-left">
-          <h1>Custom Web IDE</h1>
+          <h1>Cloud-Link IDE</h1>
           <span className="header-status">
             상태: {isLoggedIn ? `로그인됨 (${currentUser.name})` : "게스트"}
           </span>
