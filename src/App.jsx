@@ -424,7 +424,7 @@ function App() {
           <div className="chat-input-area">
             <textarea
               className="chat-input"
-              placeholder="단톡방 메시지를 입력하세요"
+              placeholder="메세지를 입력하세요"
               value={chatInput}
               onChange={(e) => setChatInput(e.target.value)}
               onKeyDown={handleChatKeyDown}
