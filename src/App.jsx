@@ -15,25 +15,31 @@ const INITIAL_JS = ``;
 const FILE_TREE = [
   {
     type: "folder",
-    name: "src",
+    name: "project",
     children: [
-      { type: "file", name: "index.html", editable: true },
       {
         type: "folder",
-        name: "styles",
-        children: [{ type: "file", name: "style.css", editable: true }],
+        name: "public",
+        children: [{ type: "file", name: "favicon.ico", editable: false }],
       },
       {
         type: "folder",
-        name: "scripts",
-        children: [{ type: "file", name: "script.js", editable: true }],
+        name: "src",
+        children: [
+          { type: "file", name: "index.html", editable: true },
+          {
+            type: "folder",
+            name: "styles",
+            children: [{ type: "file", name: "style.css", editable: true }],
+          },
+          {
+            type: "folder",
+            name: "scripts",
+            children: [{ type: "file", name: "script.js", editable: true }],
+          },
+        ],
       },
     ],
-  },
-  {
-    type: "folder",
-    name: "public",
-    children: [{ type: "file", name: "favicon.ico", editable: false }],
   },
 ];
 
@@ -69,31 +75,23 @@ function App() {
     { id: "user-103", name: "유나" },
   ]);
 
-  const [selectedFile, setSelectedFile] = useState("index.html");
+  const [selectedFile, setSelectedFile] = useState("project/src/index.html");
   const [htmlCode, setHtmlCode] = useState(INITIAL_HTML);
   const [cssCode, setCssCode] = useState(INITIAL_CSS);
   const [jsCode, setJsCode] = useState(INITIAL_JS);
 
-  const [chatMessages, setChatMessages] = useState([
- 
-
-  ]);
+  const [chatMessages, setChatMessages] = useState([]);
   const [chatInput, setChatInput] = useState("");
 
-  const [bottomTab, setBottomTab] = useState("preview");
-  const [logs, setLogs] = useState([
-    { type: "info", text: "IDE가 준비되었습니다." },
-  ]);
-
   const [openFolders, setOpenFolders] = useState({
-    src: true,
-    "src/styles": true,
-    "src/scripts": true,
-    public: true,
+    project: true,
+    "project/public": false,
+    "project/src": true,
+    "project/src/styles": true,
+    "project/src/scripts": true,
   });
 
   const chatMessagesRef = useRef(null);
-  const debugConsoleRef = useRef(null);
 
   const toggleFolder = (path) => {
     setOpenFolders((prev) => ({
@@ -107,17 +105,18 @@ function App() {
       const path = parentPath ? `${parentPath}/${node.name}` : node.name;
 
       if (node.type === "folder") {
-        const isOpen = openFolders[path];
+        const isOpen = !!openFolders[path];
 
         return (
           <div key={path} className="tree-node">
             <button
               type="button"
               className="tree-folder-row"
-              style={{ paddingLeft: `${12 + depth * 14}px` }}
+              style={{ paddingLeft: `${10 + depth * 14}px` }}
               onClick={() => toggleFolder(path)}
             >
-              <span className="tree-arrow">{isOpen ? "▾" : "▸"}</span>
+              <span className={`tree-arrow ${isOpen ? "open" : ""}`} />
+              <span className="tree-icon folder-icon" />
               <span className="tree-label">{node.name}</span>
             </button>
 
@@ -130,42 +129,46 @@ function App() {
         );
       }
 
+      const isActive = selectedFile === path;
+
       return (
         <button
           key={path}
           type="button"
-          className={`tree-file tree-file-row ${
-            selectedFile === node.name ? "active" : ""
-          } ${!node.editable ? "disabled" : ""}`}
-          style={{ paddingLeft: `${34 + depth * 14}px` }}
-          onClick={() => node.editable && setSelectedFile(node.name)}
+          className={`tree-file-row ${isActive ? "active" : ""} ${
+            !node.editable ? "disabled" : ""
+          }`}
+          style={{ paddingLeft: `${28 + depth * 14}px` }}
+          onClick={() => node.editable && setSelectedFile(path)}
         >
-          {node.name}
+          <span className="tree-arrow spacer" />
+          <span className="tree-icon file-icon" />
+          <span className="tree-label">{node.name}</span>
         </button>
       );
     });
   };
 
-  const currentCode =
-    selectedFile === "index.html"
-      ? htmlCode
-      : selectedFile === "style.css"
-      ? cssCode
-      : selectedFile === "script.js"
-      ? jsCode
-      : "";
+  const currentFileName = selectedFile.split("/").pop() || "";
 
-  const currentExtensions =
-    selectedFile === "index.html"
-      ? [html(), EditorView.lineWrapping, editorLayout]
-      : selectedFile === "style.css"
-      ? [cssLang(), EditorView.lineWrapping, editorLayout]
-      : [javascript(), EditorView.lineWrapping, editorLayout];
+  const currentCode = selectedFile.endsWith("index.html")
+    ? htmlCode
+    : selectedFile.endsWith("style.css")
+    ? cssCode
+    : selectedFile.endsWith("script.js")
+    ? jsCode
+    : "";
+
+  const currentExtensions = selectedFile.endsWith("index.html")
+    ? [html(), EditorView.lineWrapping, editorLayout]
+    : selectedFile.endsWith("style.css")
+    ? [cssLang(), EditorView.lineWrapping, editorLayout]
+    : [javascript(), EditorView.lineWrapping, editorLayout];
 
   const handleCodeChange = (value) => {
-    if (selectedFile === "index.html") setHtmlCode(value);
-    if (selectedFile === "style.css") setCssCode(value);
-    if (selectedFile === "script.js") setJsCode(value);
+    if (selectedFile.endsWith("index.html")) setHtmlCode(value);
+    if (selectedFile.endsWith("style.css")) setCssCode(value);
+    if (selectedFile.endsWith("script.js")) setJsCode(value);
   };
 
   const handleAuthClick = () => {
@@ -258,70 +261,9 @@ function App() {
     }
   };
 
-  const handleClearLogs = () => {
-    setLogs([{ type: "info", text: "콘솔이 비워졌습니다." }]);
-    setBottomTab("debug");
-  };
-
-  const buildPreviewBridgeScript = () => `
-    <script>
-      (function () {
-        const formatValue = (value) => {
-          if (typeof value === "string") return value;
-          try {
-            return JSON.stringify(value, null, 2);
-          } catch (error) {
-            return String(value);
-          }
-        };
-
-        const sendToParent = (kind, payload) => {
-          window.parent.postMessage(
-            {
-              source: "custom-web-ide-preview",
-              kind,
-              payload,
-            },
-            "*"
-          );
-        };
-
-        const originalLog = console.log.bind(console);
-        const originalWarn = console.warn.bind(console);
-        const originalError = console.error.bind(console);
-
-        console.log = (...args) => {
-          sendToParent("log", args.map(formatValue));
-          originalLog(...args);
-        };
-
-        console.warn = (...args) => {
-          sendToParent("warn", args.map(formatValue));
-          originalWarn(...args);
-        };
-
-        console.error = (...args) => {
-          sendToParent("error", args.map(formatValue));
-          originalError(...args);
-        };
-
-        window.addEventListener("error", (event) => {
-          sendToParent("error", [
-            event.message + " (" + event.lineno + ":" + event.colno + ")",
-          ]);
-        });
-
-        window.addEventListener("DOMContentLoaded", () => {
-          sendToParent("info", ["미리보기가 다시 렌더링되었습니다."]);
-        });
-      })();
-    <\/script>
-  `;
-
   const srcDoc = useMemo(() => {
     const safeJs = jsCode.replace(/<\/script>/gi, "<\\/script>");
     const styleTag = `<style>\n${cssCode}\n</style>`;
-    const bridgeScript = buildPreviewBridgeScript();
     const userScript = `<script>\n${safeJs}\n<\/script>`;
 
     if (/<html[\s>]/i.test(htmlCode)) {
@@ -336,12 +278,9 @@ function App() {
       }
 
       if (/<\/body>/i.test(doc)) {
-        doc = doc.replace(
-          /<\/body>/i,
-          `${bridgeScript}\n${userScript}\n</body>`
-        );
+        doc = doc.replace(/<\/body>/i, `${userScript}\n</body>`);
       } else {
-        doc = `${doc}\n${bridgeScript}\n${userScript}`;
+        doc = `${doc}\n${userScript}`;
       }
 
       return doc;
@@ -356,39 +295,16 @@ function App() {
   </head>
   <body>
     ${htmlCode}
-    ${bridgeScript}
     ${userScript}
   </body>
 </html>`;
   }, [htmlCode, cssCode, jsCode]);
 
   useEffect(() => {
-    const handler = (event) => {
-      const data = event.data;
-      if (!data || data.source !== "custom-web-ide-preview") return;
-
-      const text = Array.isArray(data.payload)
-        ? data.payload.join(" ")
-        : String(data.payload);
-
-      setLogs((prev) => [...prev, { type: data.kind, text }]);
-    };
-
-    window.addEventListener("message", handler);
-    return () => window.removeEventListener("message", handler);
-  }, []);
-
-  useEffect(() => {
     if (chatMessagesRef.current) {
       chatMessagesRef.current.scrollTop = chatMessagesRef.current.scrollHeight;
     }
   }, [chatMessages]);
-
-  useEffect(() => {
-    if (bottomTab === "debug" && debugConsoleRef.current) {
-      debugConsoleRef.current.scrollTop = debugConsoleRef.current.scrollHeight;
-    }
-  }, [logs, bottomTab]);
 
   return (
     <div className="app">
@@ -401,9 +317,6 @@ function App() {
         </div>
 
         <div className="header-actions">
-          <button className="small-button" onClick={handleClearLogs}>
-            콘솔 비우기
-          </button>
           <button
             className={`auth-button ${isLoggedIn ? "logout" : ""}`}
             onClick={handleAuthClick}
@@ -415,36 +328,21 @@ function App() {
 
       <div className="workspace">
         <aside className="left-sidebar">
-          <div className="sidebar-title">파일 탐색기</div>
+          <div className="sidebar-title">작업 영역</div>
           <div className="tree-root">{renderTree(FILE_TREE)}</div>
         </aside>
 
         <main className="center-panel">
           <div className="editor-toolbar">
             <div className="editor-meta">
-              <span className="current-file">{selectedFile}</span>
+              <span className="current-file">{currentFileName}</span>
               <span className="file-type">
-                {selectedFile === "index.html"
+                {selectedFile.endsWith("index.html")
                   ? "HTML"
-                  : selectedFile === "style.css"
+                  : selectedFile.endsWith("style.css")
                   ? "CSS"
                   : "JavaScript"}
               </span>
-            </div>
-
-            <div className="editor-toolbar-actions">
-              <button
-                className="small-button"
-                onClick={() => setBottomTab("preview")}
-              >
-                결과 보기
-              </button>
-              <button
-                className="small-button"
-                onClick={() => setBottomTab("debug")}
-              >
-                디버그 보기
-              </button>
             </div>
           </div>
 
@@ -459,39 +357,15 @@ function App() {
           </div>
 
           <section className="bottom-panel">
-            <div className="bottom-tabs">
-              <button
-                className={bottomTab === "preview" ? "active" : ""}
-                onClick={() => setBottomTab("preview")}
-              >
-                결과 출력
-              </button>
-              <button
-                className={bottomTab === "debug" ? "active" : ""}
-                onClick={() => setBottomTab("debug")}
-              >
-                디버그 콘솔
-              </button>
-            </div>
+            <div className="bottom-panel-title">결과화면</div>
 
             <div className="bottom-content">
-              {bottomTab === "preview" ? (
-                <iframe
-                  title="preview"
-                  className="preview-frame"
-                  srcDoc={srcDoc}
-                  sandbox="allow-scripts"
-                />
-              ) : (
-                <div className="debug-console" ref={debugConsoleRef}>
-                  {logs.map((log, index) => (
-                    <div key={index} className={`log-row ${log.type}`}>
-                      <span className="log-type">{log.type}</span>
-                      <span className="log-text">{log.text}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
+              <iframe
+                title="preview"
+                className="preview-frame"
+                srcDoc={srcDoc}
+                sandbox="allow-scripts"
+              />
             </div>
           </section>
         </main>
