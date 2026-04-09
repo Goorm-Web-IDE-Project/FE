@@ -1,8 +1,12 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import useAuthStore from "../store/authStore";
+import useChatStore from "../store/chatStore";
 
 function LoginPage() {
   const navigate = useNavigate();
+  const login = useAuthStore((state) => state.login);
+  const enterRoom = useChatStore((state) => state.enterRoom);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -12,10 +16,8 @@ function LoginPage() {
 
     const displayName = email?.split("@")[0]?.trim() || "나";
 
-    sessionStorage.setItem("isLoggedIn", "true");
-    sessionStorage.setItem("currentUserName", displayName);
-    sessionStorage.setItem("currentUserId", "user-me");
-
+    login(displayName);
+    enterRoom(displayName);
     navigate("/workspace");
   };
 

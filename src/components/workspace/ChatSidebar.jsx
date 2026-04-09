@@ -1,18 +1,13 @@
 import { useEffect, useRef, useState } from "react";
+import useAuthStore from "../../store/authStore";
+import useChatStore from "../../store/chatStore";
 
-function ChatSidebar({ currentRoom, participants, currentUser }) {
-  const [chatMessages, setChatMessages] = useState([
-    {
-      id: Date.now(),
-      roomId: currentRoom.id,
-      type: "system",
-      text: `${currentUser.name}님이 입장했습니다.`,
-      createdAt: new Date().toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-    },
-  ]);
+function ChatSidebar() {
+  const currentUser = useAuthStore((state) => state.currentUser);
+  const currentRoom = useChatStore((state) => state.currentRoom);
+  const participants = useChatStore((state) => state.participants);
+  const chatMessages = useChatStore((state) => state.chatMessages);
+  const sendMessage = useChatStore((state) => state.sendMessage);
 
   const [chatInput, setChatInput] = useState("");
   const chatMessagesRef = useRef(null);
@@ -27,22 +22,7 @@ function ChatSidebar({ currentRoom, participants, currentUser }) {
     const trimmed = chatInput.trim();
     if (!trimmed) return;
 
-    const now = new Date().toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-
-    const newMessage = {
-      id: Date.now(),
-      roomId: currentRoom.id,
-      type: "message",
-      senderId: currentUser.id,
-      senderName: currentUser.name,
-      text: trimmed,
-      createdAt: now,
-    };
-
-    setChatMessages((prev) => [...prev, newMessage]);
+    sendMessage(trimmed, currentUser);
     setChatInput("");
   };
 

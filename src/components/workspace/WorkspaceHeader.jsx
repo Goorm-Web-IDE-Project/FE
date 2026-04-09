@@ -1,12 +1,16 @@
 import { useNavigate } from "react-router-dom";
+import useAuthStore from "../../store/authStore";
+import useChatStore from "../../store/chatStore";
 
-function WorkspaceHeader({ currentUser }) {
+function WorkspaceHeader() {
   const navigate = useNavigate();
+  const currentUser = useAuthStore((state) => state.currentUser);
+  const logout = useAuthStore((state) => state.logout);
+  const clearRoom = useChatStore((state) => state.clearRoom);
 
   const handleLogout = () => {
-    sessionStorage.removeItem("isLoggedIn");
-    sessionStorage.removeItem("currentUserName");
-    sessionStorage.removeItem("currentUserId");
+    logout();
+    clearRoom();
     navigate("/login");
   };
 

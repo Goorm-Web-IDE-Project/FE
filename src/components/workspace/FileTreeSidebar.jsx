@@ -1,10 +1,10 @@
-function FileTreeSidebar({
-  fileTree,
-  openFolders,
-  selectedFile,
-  toggleFolder,
-  setSelectedFile,
-}) {
+import { FILE_TREE } from "../../constants/fileTree";
+import useFileTreeStore from "../../store/fileTreeStore";
+
+function FileTreeSidebar() {
+  const { selectedFile, openFolders, toggleFolder, setSelectedFile } =
+    useFileTreeStore();
+
   const renderTree = (nodes, depth = 0, parentPath = "") => {
     return nodes.map((node) => {
       const path = parentPath ? `${parentPath}/${node.name}` : node.name;
@@ -57,7 +57,7 @@ function FileTreeSidebar({
   return (
     <aside className="left-sidebar">
       <div className="sidebar-title">작업 영역</div>
-      <div className="tree-root">{renderTree(fileTree)}</div>
+      <div className="tree-root">{renderTree(FILE_TREE)}</div>
     </aside>
   );
 }

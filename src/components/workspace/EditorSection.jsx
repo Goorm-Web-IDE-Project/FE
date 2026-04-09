@@ -4,6 +4,8 @@ import { html } from "@codemirror/lang-html";
 import { css as cssLang } from "@codemirror/lang-css";
 import { javascript } from "@codemirror/lang-javascript";
 import { EditorView } from "@codemirror/view";
+import useFileTreeStore from "../../store/fileTreeStore";
+import useEditorStore from "../../store/editorStore";
 
 const editorLayout = EditorView.theme({
   "&": {
@@ -14,15 +16,17 @@ const editorLayout = EditorView.theme({
   },
 });
 
-function EditorSection({
-  selectedFile,
-  htmlCode,
-  cssCode,
-  jsCode,
-  setHtmlCode,
-  setCssCode,
-  setJsCode,
-}) {
+function EditorSection() {
+  const selectedFile = useFileTreeStore((state) => state.selectedFile);
+  const {
+    htmlCode,
+    cssCode,
+    jsCode,
+    setHtmlCode,
+    setCssCode,
+    setJsCode,
+  } = useEditorStore();
+
   const currentFileName = selectedFile.split("/").pop() || "";
 
   const currentCode = selectedFile.endsWith("index.html")
