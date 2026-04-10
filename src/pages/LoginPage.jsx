@@ -28,7 +28,7 @@ function LoginPage() {
   return (
     <div className="loginPage">
       <div className="loginBox">
-        <h1 className="loginTitle">Login</h1>
+        <h1 className="loginTitle">Cloud-Link IDE</h1>
         <p className="loginText">아이디와 비밀번호를 입력해주세요.</p>
 
         <form className="loginForm" onSubmit={handleSubmit}>
