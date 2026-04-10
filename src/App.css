@@ -30,6 +30,10 @@ button {
   outline: none;
 }
 
+a {
+  text-decoration: none;
+}
+
 .app {
   min-height: 100vh;
   display: flex;
@@ -135,7 +139,6 @@ button {
 .tree-folder-row,
 .tree-file-row {
   width: 100%;
-  border: none;
   background: transparent;
   color: #cbd5e1;
   display: flex;
@@ -480,7 +483,7 @@ button {
 
 .chat-message.mine .chat-bubble {
   background: #2563eb;
-  color: white;
+  color: #ffffff;
 }
 
 .chat-message.other .chat-bubble {
@@ -503,7 +506,7 @@ button {
   resize: vertical;
   border: 1px solid #334155;
   background: #0f172a;
-  color: white;
+  color: #ffffff;
   border-radius: 8px;
   padding: 10px;
   outline: none;
@@ -512,74 +515,164 @@ button {
 
 .chat-send-button {
   background: #2563eb;
-  color: white;
+  color: #ffffff;
   padding: 8px 12px;
-  border: none;
-  border-radius: 8px;
   align-self: flex-end;
-  cursor: pointer;
 }
 
-.login-modal-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 1000;
-  background: rgba(2, 6, 23, 0.7);
+/* login / signup */
+.loginPage,
+.signPage {
+  min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 16px;
+  padding: 24px;
+  background: #0f172a;
 }
 
-.login-modal {
+.loginBox,
+.signBox {
   width: 100%;
-  max-width: 320px;
+  max-width: 420px;
   background: #ffffff;
-  color: #0f172a;
-  border-radius: 14px;
-  padding: 20px;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+  color: #111827;
+  border-radius: 16px;
+  padding: 32px 28px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18);
 }
 
-.login-modal h2 {
-  margin-top: 0;
-  margin-bottom: 12px;
-  font-size: 18px;
+.loginTitle,
+.signTitle {
+  margin: 0 0 8px;
+  font-size: 32px;
+  font-weight: 700;
+  text-align: center;
+  color: #111827;
 }
 
-.login-modal form {
+.loginText,
+.signText {
+  margin: 0 0 24px;
+  font-size: 14px;
+  text-align: center;
+  color: #6b7280;
+}
+
+.loginForm,
+.signForm {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
 }
 
-.login-modal input {
+.loginId,
+.loginPassword,
+.signName,
+.signId,
+.signPassword,
+.signConfirmPassword {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.loginId label,
+.loginPassword label,
+.signName label,
+.signId label,
+.signPassword label,
+.signConfirmPassword label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.loginId input,
+.loginPassword input,
+.signName input,
+.signId input,
+.signPassword input,
+.signConfirmPassword input {
   width: 100%;
-  padding: 10px;
-  font-size: 13px;
-  border: 1px solid #cbd5e1;
-  border-radius: 8px;
+  height: 44px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  padding: 0 14px;
+  font-size: 14px;
   outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-.login-modal-buttons {
+.loginId input:focus,
+.loginPassword input:focus,
+.signName input:focus,
+.signId input:focus,
+.signPassword input:focus,
+.signConfirmPassword input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+}
+
+.loginButton,
+.signButton,
+.cancelButton {
+  height: 46px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.loginButton,
+.signButton {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.loginButton:hover,
+.signButton:hover {
+  background: #1d4ed8;
+}
+
+.cancelButton {
+  background: #e5e7eb;
+  color: #111827;
+}
+
+.cancelButton:hover {
+  background: #d1d5db;
+}
+
+.signButtons {
   display: flex;
   gap: 10px;
   margin-top: 6px;
 }
 
-.login-modal-buttons button {
+.signButtons .signButton,
+.signButtons .cancelButton {
   flex: 1;
-  border-radius: 8px;
-  padding: 10px;
-  font-size: 13px;
-  cursor: pointer;
-  background: #2563eb;
-  color: #ffffff;
 }
 
-.login-modal-buttons .cancel-button {
-  background: #64748b;
+.loginLink,
+.signLink {
+  margin-top: 18px;
+  text-align: center;
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.loginLink a,
+.signLink a {
+  color: #2563eb;
+  font-weight: 600;
+}
+
+.loginLink a:hover,
+.signLink a:hover {
+  text-decoration: underline;
 }
 
 @media (max-width: 1600px) {
@@ -637,5 +730,16 @@ button {
 
   .preview-frame {
     min-height: 320px;
+  }
+
+  .loginBox,
+  .signBox {
+    padding: 24px 18px;
+    border-radius: 14px;
+  }
+
+  .loginTitle,
+  .signTitle {
+    font-size: 28px;
   }
 }

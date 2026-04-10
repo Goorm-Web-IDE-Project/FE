@@ -1,61 +1,67 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import useAuthStore from "../store/authStore";
-import useChatStore from "../store/chatStore";
+import "../App.css";
 
 function LoginPage() {
   const navigate = useNavigate();
-  const login = useAuthStore((state) => state.login);
-  const enterRoom = useChatStore((state) => state.enterRoom);
-
-  const [email, setEmail] = useState("");
+  const [loginId, setUserId] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLoginSubmit = (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
 
-    const displayName = email?.split("@")[0]?.trim() || "나";
+    if (!loginId || !password) {
+      alert("아이디와 비밀번호를 입력해주세요.");
+      return;
+    }
 
-    login(displayName);
-    enterRoom(displayName);
+    console.log("로그인 시도:", loginId, password);
+
+    // 임시 로그인 처리 //
+    sessionStorage.setItem("isLoggedIn", "true");
+    sessionStorage.setItem("currentUserName", loginId);
+    sessionStorage.setItem("currentUserId", "user-me");
+
     navigate("/workspace");
   };
 
   return (
-    <div style={{ padding: "40px" }}>
-      <h1>로그인</h1>
+    <div className="loginPage">
+      <div className="loginBox">
+        <h1 className="loginTitle">Login</h1>
+        <p className="loginText">아이디와 비밀번호를 입력해주세요.</p>
 
-      <form
-        onSubmit={handleLoginSubmit}
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "12px",
-          maxWidth: "320px",
-          marginTop: "20px",
-        }}
-      >
-        <input
-          type="email"
-          placeholder="이메일"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
+        <form className="loginForm" onSubmit={handleSubmit}>
+          <div className="loginId">
+            <label htmlFor="loginId">ID</label>
+            <input
+              id="loginId"
+              type="text"
+              value={loginId}
+              onChange={(e) => setUserId(e.target.value)}
+              placeholder="아이디 입력"
+            />
+          </div>
 
-        <input
-          type="password"
-          placeholder="비밀번호"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
+          <div className="loginPassword">
+            <label htmlFor="loginPassword">PW</label>
+            <input
+              id="loginPassword"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="비밀번호 입력"
+            />
+          </div>
 
-        <button type="submit">로그인</button>
-      </form>
+          <button className="loginButton" type="submit">
+            로그인
+          </button>
+        </form>
 
-      <div style={{ marginTop: "16px" }}>
-        <Link to="/signup">회원가입으로 이동</Link>
+        <div className="loginLink">
+          계정이 없나요? <Link to="/signup">회원가입</Link>
+        </div>
       </div>
     </div>
   );
