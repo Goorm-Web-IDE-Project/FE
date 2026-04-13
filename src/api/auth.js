@@ -1,7 +1,7 @@
 import api from "./axios";
 
 export const loginRequest = ({ userId, password, name }) => {
-  return api.post("/api/auth/login", {
+  return api.post("/auth/login", {
     userId,
     password,
     name,
@@ -9,7 +9,7 @@ export const loginRequest = ({ userId, password, name }) => {
 };
 
 export const signupRequest = ({ userId, password, name }) => {
-  return api.post("/api/auth/signup", {
+  return api.post("/auth/signup", {
     userId,
     password,
     name,

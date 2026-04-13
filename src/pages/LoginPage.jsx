@@ -30,7 +30,7 @@ function LoginPage() {
 
       sessionStorage.setItem("isLoggedIn", "true");
       sessionStorage.setItem("currentUserName", loginId);
-      sessionStorage.setItem("currentUserId", "user-me");
+      sessionStorage.setItem("currentUserId", loginId);
 
       navigate("/workspace");
     } catch (error) {
