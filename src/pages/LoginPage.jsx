@@ -1,13 +1,15 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "../App.css";
+import { loginRequest } from "../api/auth";
 
 function LoginPage() {
   const navigate = useNavigate();
   const [loginId, setUserId] = useState("");
   const [password, setPassword] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!loginId || !password) {
@@ -15,20 +17,34 @@ function LoginPage() {
       return;
     }
 
-    console.log("로그인 시도:", loginId, password);
+    try {
+      setIsSubmitting(true);
 
-    // 임시 로그인 처리 //
-    sessionStorage.setItem("isLoggedIn", "true");
-    sessionStorage.setItem("currentUserName", loginId);
-    sessionStorage.setItem("currentUserId", "user-me");
+      const response = await loginRequest({
+        userId: loginId,
+        password,
+        name: loginId,
+      });
 
-    navigate("/workspace");
+      console.log("로그인 응답:", response.data);
+
+      sessionStorage.setItem("isLoggedIn", "true");
+      sessionStorage.setItem("currentUserName", loginId);
+      sessionStorage.setItem("currentUserId", "user-me");
+
+      navigate("/workspace");
+    } catch (error) {
+      console.error(error);
+      alert(error.response?.data || "로그인에 실패했습니다.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
     <div className="loginPage">
       <div className="loginBox">
-        <h1 className="loginTitle">Cloud-Link IDE</h1>
+        <h1 className="loginTitle">Login</h1>
         <p className="loginText">아이디와 비밀번호를 입력해주세요.</p>
 
         <form className="loginForm" onSubmit={handleSubmit}>
@@ -54,8 +70,8 @@ function LoginPage() {
             />
           </div>
 
-          <button className="loginButton" type="submit">
-            로그인
+          <button className="loginButton" type="submit" disabled={isSubmitting}>
+            {isSubmitting ? "로그인 중..." : "로그인"}
           </button>
         </form>
 

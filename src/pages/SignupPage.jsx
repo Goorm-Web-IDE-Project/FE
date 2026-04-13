@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "../App.css";
+import { signupRequest } from "../api/auth";
 
 function SignupPage() {
   const navigate = useNavigate();
@@ -12,6 +13,8 @@ function SignupPage() {
     name: "",
   });
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -21,7 +24,7 @@ function SignupPage() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const { userId, password, confirmPassword, name } = formData;
@@ -36,10 +39,25 @@ function SignupPage() {
       return;
     }
 
-    console.log("회원가입 데이터:", formData);
-    alert("회원가입이 완료되었습니다!");
+    try {
+      setIsSubmitting(true);
 
-    navigate("/login");
+      const response = await signupRequest({
+        userId,
+        password,
+        name,
+      });
+
+      console.log("회원가입 응답:", response.data);
+      alert("회원가입이 완료되었습니다.");
+
+      navigate("/login");
+    } catch (error) {
+      console.error(error);
+      alert(error.response?.data || "회원가입에 실패했습니다.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -98,8 +116,8 @@ function SignupPage() {
           </div>
 
           <div className="signButtons">
-            <button className="signButton" type="submit">
-              가입하기
+            <button className="signButton" type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "가입 중..." : "가입하기"}
             </button>
             <button
               className="cancelButton"
